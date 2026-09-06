@@ -3,10 +3,10 @@ import { normalizeSearch } from "./slugify.ts";
 import type { CategoryRow, CountyRow, Supplier, SupplierCard } from "@/types/db";
 
 const CARD_COLUMNS =
-  "id, slug, name, short_description, logo_url, city, national, verified, county:counties(id, code, name, slug, sort_order), links:supplier_categories(category:categories(slug, name))";
+  "id, slug, name, short_description, logo_url, city, national, verified, county:counties!county_id(id, code, name, slug, sort_order), links:supplier_categories(category:categories(slug, name))";
 
 const FULL_COLUMNS =
-  "*, county:counties(id, code, name, slug, sort_order), links:supplier_categories(category:categories(*)), served:supplier_counties(county:counties(id, code, name, slug, sort_order))";
+  "*, county:counties!county_id(id, code, name, slug, sort_order), links:supplier_categories(category:categories(*)), served:supplier_counties(county:counties(id, code, name, slug, sort_order))";
 
 export const PAGE_SIZE = 20;
 
