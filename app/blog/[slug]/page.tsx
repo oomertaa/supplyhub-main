@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MDXRemote } from "next-mdx-remote/rsc";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { SupplierRow } from "@/components/SupplierRow";
 import { formatDate, getAllPosts, getPost } from "@/lib/blog";
@@ -79,9 +78,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           </div>
         )}
 
-        <div className="prose mt-12">
-          <MDXRemote source={post.content} />
-        </div>
+        <div className="prose mt-12" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
       </article>
 
       {linked.length > 0 && (

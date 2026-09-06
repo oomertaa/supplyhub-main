@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { remark } from "remark";
+import html from "remark-html";
 
 const BLOG_DIR = path.join(process.cwd(), "content", "blog");
 
@@ -17,7 +19,7 @@ export type PostMeta = {
   readingMinutes: number;
 };
 
-export type Post = PostMeta & { content: string };
+export type Post = PostMeta & { content: string; contentHtml: string };
 
 function readingMinutes(content: string): number {
   const words = content.trim().split(/\s+/).filter(Boolean).length;
@@ -28,6 +30,8 @@ function parse(fileName: string): Post | null {
   const raw = fs.readFileSync(path.join(BLOG_DIR, fileName), "utf8");
   const { data, content } = matter(raw);
   if (!data.title || !data.date) return null;
+
+  const contentHtml = remark().use(html, { sanitize: false }).processSync(content).toString();
 
   return {
     slug: fileName.replace(/\.mdx?$/, ""),
@@ -43,6 +47,7 @@ function parse(fileName: string): Post | null {
     published: data.published !== false,
     readingMinutes: readingMinutes(content),
     content,
+    contentHtml,
   };
 }
 

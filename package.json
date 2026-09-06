@@ -13,9 +13,10 @@
     "@supabase/supabase-js": "^2.45.4",
     "gray-matter": "^4.0.3",
     "next": "^15.5.25",
-    "next-mdx-remote": "^5.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
     "resend": "^4.0.1"
   },
   "devDependencies": {
