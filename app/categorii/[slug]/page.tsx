@@ -43,11 +43,12 @@ export default async function CategoryPage({
   searchParams: Promise<{ pagina?: string }>;
 }) {
   const [{ slug }, sp] = await Promise.all([params, searchParams]);
-  const category = await getCategory(slug);
-  if (!category) notFound();
-
   const page = Number(sp.pagina ?? "1") || 1;
-  const result = await listSuppliers({ category: slug, page });
+  const [category, result] = await Promise.all([
+    getCategory(slug),
+    listSuppliers({ category: slug, page }),
+  ]);
+  if (!category) notFound();
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-14">

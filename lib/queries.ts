@@ -90,29 +90,25 @@ export async function getFeatured(limit = 6): Promise<SupplierCard[]> {
   return (data ?? []).map(toCard);
 }
 
-/** ID-urile distribuitorilor legati de o categorie. */
+/** ID-urile distribuitorilor legati de o categorie — un singur query cu JOIN. */
 async function supplierIdsForCategory(slug: string): Promise<number[] | null> {
   const db = getPublicClient();
   if (!db) return null;
-  const { data: cat } = await db.from("categories").select("id").eq("slug", slug).maybeSingle();
-  if (!cat) return [];
   const { data } = await db
     .from("supplier_categories")
-    .select("supplier_id")
-    .eq("category_id", (cat as { id: number }).id);
+    .select("supplier_id, categories!inner(slug)")
+    .eq("categories.slug", slug);
   return (data ?? []).map((r: { supplier_id: number }) => r.supplier_id);
 }
 
-/** ID-urile distribuitorilor care servesc explicit un judet (fara cei nationali). */
+/** ID-urile distribuitorilor care servesc explicit un judet — un singur query cu JOIN. */
 async function supplierIdsForCounty(slug: string): Promise<number[] | null> {
   const db = getPublicClient();
   if (!db) return null;
-  const { data: county } = await db.from("counties").select("id").eq("slug", slug).maybeSingle();
-  if (!county) return [];
   const { data } = await db
     .from("supplier_counties")
-    .select("supplier_id")
-    .eq("county_id", (county as { id: number }).id);
+    .select("supplier_id, counties!inner(slug)")
+    .eq("counties.slug", slug);
   return (data ?? []).map((r: { supplier_id: number }) => r.supplier_id);
 }
 
