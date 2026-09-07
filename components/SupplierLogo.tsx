@@ -19,7 +19,7 @@ export function SupplierLogo({
 
   return (
     <div
-      className="relative shrink-0 overflow-hidden border border-rule bg-white"
+      className="relative shrink-0 overflow-hidden rounded-tile border border-line bg-paper"
       style={{ width: size, height: size }}
     >
       {src ? (
@@ -33,8 +33,8 @@ export function SupplierLogo({
       ) : (
         <span
           aria-hidden="true"
-          className="flex h-full w-full items-center justify-center bg-accent-soft font-semibold text-accent"
-          style={{ fontSize: size * 0.32 }}
+          className="flex h-full w-full items-center justify-center bg-accent-soft font-bold tracking-tight text-accent"
+          style={{ fontSize: size * 0.34 }}
         >
           {initials}
         </span>

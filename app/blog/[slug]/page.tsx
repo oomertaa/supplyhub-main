@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { SupplierRow } from "@/components/SupplierRow";
+import { IconArrowLeft, IconClock } from "@/components/Icons";
 import { formatDate, getAllPosts, getPost } from "@/lib/blog";
 import { getCategories, getSuppliersForCategories } from "@/lib/queries";
 import { pageMetadata } from "@/lib/seo";
@@ -47,71 +48,94 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const linked = categories.filter((c) => post.relatedCategories.includes(c.slug));
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14">
-      <Breadcrumbs
-        crumbs={[
-          { name: "Acasă", path: "/" },
-          { name: "Analize", path: "/blog" },
-          { name: post.title, path: `/blog/${post.slug}` },
-        ]}
-      />
+    <>
+      <div className="border-b border-line bg-paper">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+          <Breadcrumbs
+            crumbs={[
+              { name: "Acasă", path: "/" },
+              { name: "Analize", path: "/blog" },
+              { name: post.title, path: `/blog/${post.slug}` },
+            ]}
+          />
 
-      <article>
-        <header className="max-w-3xl">
-          <h1 className="text-display font-semibold">{post.title}</h1>
-          <p className="mt-5 text-lg text-muted">{post.description}</p>
-          <p className="mt-5 text-sm text-muted">
-            {formatDate(post.date)}, {post.readingMinutes} min de citit, de {post.author}
-          </p>
-        </header>
-
-        {post.cover && (
-          <div className="relative mt-10 aspect-[16/7] w-full overflow-hidden border border-rule">
-            <Image
-              src={post.cover}
-              alt=""
-              fill
-              sizes="(max-width: 1024px) 100vw, 1024px"
-              className="object-cover"
-              priority
-            />
+          <div className="mt-7 max-w-3xl">
+            <p className="eyebrow">Analiză</p>
+            <h1 className="mt-3 text-display font-bold text-ink">{post.title}</h1>
+            <p className="mt-4 text-lg leading-relaxed text-muted">{post.description}</p>
+            <p className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+              <IconClock className="size-4 text-accent/70" />
+              {formatDate(post.date)}
+              <span aria-hidden="true" className="text-line">
+                ·
+              </span>
+              {post.readingMinutes} min de citit
+              <span aria-hidden="true" className="text-line">
+                ·
+              </span>
+              de {post.author}
+            </p>
           </div>
-        )}
+        </div>
+      </div>
 
-        <div className="prose mt-12" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
-      </article>
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+        <article className="card max-w-3xl p-6 sm:p-10">
+          {post.cover && (
+            <div className="relative mb-9 aspect-[16/7] w-full overflow-hidden rounded-tile border border-line">
+              <Image
+                src={post.cover}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 100vw, 768px"
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
 
-      {linked.length > 0 && (
-        <section className="mt-14 max-w-3xl border-t border-rule pt-8">
-          <h2 className="text-sm font-semibold">Categorii din articol</h2>
-          <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-[0.95rem]">
-            {linked.map((c) => (
-              <li key={c.slug}>
-                <Link
-                  href={`/categorii/${c.slug}`}
-                  className="border border-rule px-3 py-1.5 hover:border-accent hover:text-accent"
-                >
-                  {c.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          <div className="prose" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
+        </article>
 
-      {related.length > 0 && (
-        <section className="mt-12 max-w-3xl border border-rule p-6">
-          <h2 className="text-xl font-semibold tracking-tight">Distribuitori relevanți</h2>
-          <p className="mt-2 text-muted">
-            Firme care vând echipamentele discutate în articol.
+        <div className="mt-6 max-w-3xl space-y-6">
+          {linked.length > 0 && (
+            <section className="card p-6">
+              <h2 className="text-sm font-bold text-ink">Categorii din articol</h2>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {linked.map((c) => (
+                  <li key={c.slug}>
+                    <Link href={`/categorii/${c.slug}`} className="chip">
+                      {c.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {related.length > 0 && (
+            <section>
+              <h2 className="text-title font-bold text-ink">Distribuitori relevanți</h2>
+              <p className="mt-2 text-muted">Firme care vând echipamentele discutate în articol.</p>
+              <div className="mt-5 grid gap-4">
+                {related.map((s) => (
+                  <SupplierRow key={s.id} supplier={s} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <p>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+            >
+              <IconArrowLeft className="size-4" />
+              Toate analizele
+            </Link>
           </p>
-          <div className="mt-4">
-            {related.map((s) => (
-              <SupplierRow key={s.id} supplier={s} />
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
+        </div>
+      </div>
+    </>
   );
 }

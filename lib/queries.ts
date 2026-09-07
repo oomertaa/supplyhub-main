@@ -213,6 +213,17 @@ export async function getSuppliersForCategories(
   return (data ?? []).map(toCard);
 }
 
+/** Cate firme publicate are catalogul. Doar numarul, fara randuri. */
+export async function countPublishedSuppliers(): Promise<number> {
+  const db = getPublicClient();
+  if (!db) return warnMissingConfig("countPublishedSuppliers"), 0;
+  const { count } = await db
+    .from("suppliers")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "published");
+  return count ?? 0;
+}
+
 export async function countSuppliersPerCategory(): Promise<Record<string, number>> {
   const db = getPublicClient();
   if (!db) return warnMissingConfig("countSuppliersPerCategory"), {};

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { CategoryIcon } from "@/components/CategoryIcon";
+import { PageHeader } from "@/components/PageHeader";
 import { Pagination } from "@/components/Pagination";
 import { SupplierRow } from "@/components/SupplierRow";
 import { getCategories, getCategory, listSuppliers } from "@/lib/queries";
@@ -44,15 +46,22 @@ export default async function CategoryPage({
 }) {
   const [{ slug }, sp] = await Promise.all([params, searchParams]);
   const page = Number(sp.pagina ?? "1") || 1;
-  const [category, result] = await Promise.all([
+  const [category, result, categories] = await Promise.all([
     getCategory(slug),
     listSuppliers({ category: slug, page }),
+    getCategories(),
   ]);
   if (!category) notFound();
 
+  const others = categories.filter((c) => c.slug !== category.slug);
+
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14">
-      <Breadcrumbs
+    <>
+      <PageHeader
+        eyebrow="Categorie"
+        icon={<CategoryIcon slug={category.slug} className="size-5.5" />}
+        title={`Distribuitori ${category.name.toLowerCase()}`}
+        lead={category.description ?? undefined}
         crumbs={[
           { name: "Acasă", path: "/" },
           { name: "Distribuitori", path: "/distribuitori" },
@@ -60,40 +69,58 @@ export default async function CategoryPage({
         ]}
       />
 
-      <h1 className="max-w-3xl text-display font-semibold">
-        Distribuitori {category.name.toLowerCase()}
-      </h1>
-      {category.description && (
-        <p className="mt-5 max-w-2xl text-lg text-muted">{category.description}</p>
-      )}
-
-      <p className="mt-10 border-t border-rule pt-6 text-sm text-muted">
-        {result.total === 0
-          ? "Niciun distribuitor listat momentan"
-          : result.total === 1
-            ? "1 distribuitor"
-            : `${result.total} distribuitori`}
-      </p>
-
-      {result.items.length > 0 ? (
-        <div className="mt-2">
-          {result.items.map((s) => (
-            <SupplierRow key={s.id} supplier={s} />
-          ))}
-        </div>
-      ) : (
-        <p className="mt-6 max-w-xl text-muted">
-          Categoria este în curs de completare. Între timp, poți căuta în lista completă de
-          distribuitori.
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+        <p className="mb-3 text-sm font-medium text-muted">
+          {result.total === 0
+            ? "Niciun distribuitor listat momentan"
+            : result.total === 1
+              ? "1 distribuitor"
+              : `${result.total} distribuitori`}
         </p>
-      )}
 
-      <Pagination
-        page={result.page}
-        pageCount={result.pageCount}
-        basePath={`/categorii/${category.slug}`}
-        params={{}}
-      />
-    </div>
+        {result.items.length > 0 ? (
+          <div className="grid gap-4">
+            {result.items.map((s) => (
+              <SupplierRow key={s.id} supplier={s} />
+            ))}
+          </div>
+        ) : (
+          <div className="card p-8 text-center sm:p-12">
+            <h2 className="text-xl font-bold tracking-tight text-ink">
+              Categoria este în curs de completare
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-muted">
+              Între timp, poți căuta în lista completă de distribuitori: mulți furnizori acoperă mai
+              multe categorii decât cele declarate.
+            </p>
+            <Link href="/distribuitori" className="btn btn-secondary mt-6">
+              Vezi tot catalogul
+            </Link>
+          </div>
+        )}
+
+        <Pagination
+          page={result.page}
+          pageCount={result.pageCount}
+          basePath={`/categorii/${category.slug}`}
+          params={{}}
+        />
+
+        {others.length > 0 && (
+          <section className="mt-12 border-t border-line pt-8">
+            <h2 className="text-sm font-bold text-ink">Alte categorii de echipamente</h2>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {others.map((c) => (
+                <li key={c.slug}>
+                  <Link href={`/categorii/${c.slug}`} className="chip">
+                    {c.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </>
   );
 }

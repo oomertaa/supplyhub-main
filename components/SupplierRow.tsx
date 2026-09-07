@@ -1,47 +1,69 @@
 import Link from "next/link";
 import { SupplierLogo } from "./SupplierLogo";
+import { VerifiedBadge } from "./VerifiedBadge";
+import { IconArrowRight, IconGlobe, IconPin } from "./Icons";
 import type { SupplierCard } from "@/types/db";
 
+/** Un distribuitor din liste: card propriu, cu contur si stare de hover. */
 export function SupplierRow({ supplier }: { supplier: SupplierCard }) {
   const location = supplier.national
     ? "Livrează în toată țara"
     : [supplier.city, supplier.county?.name].filter(Boolean).join(", ") || "Locație neprecizată";
+  const LocationIcon = supplier.national ? IconGlobe : IconPin;
 
   return (
-    <article className="grid grid-cols-[56px_1fr] gap-x-4 gap-y-3 border-b border-rule py-7 sm:grid-cols-[56px_1fr_auto] sm:gap-x-6">
-      <SupplierLogo name={supplier.name} src={supplier.logo_url} />
+    <article className="card card-hover group p-5 sm:p-6">
+      <div className="flex gap-4 sm:gap-5">
+        <SupplierLogo name={supplier.name} src={supplier.logo_url} />
 
-      <div className="min-w-0">
-        <h3 className="text-lg font-semibold tracking-tight">
-          <Link href={`/distribuitori/${supplier.slug}`} className="hover:text-accent hover:underline">
-            {supplier.name}
-          </Link>
-          {supplier.verified && (
-            <span className="ml-2 align-middle text-xs font-medium text-accent" title="Date de contact verificate de echipa SupplyHub">
-              verificat
-            </span>
-          )}
-        </h3>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <h3 className="text-lg font-bold tracking-tight text-ink">
+              <Link
+                href={`/distribuitori/${supplier.slug}`}
+                className="transition-colors group-hover:text-accent"
+              >
+                {supplier.name}
+              </Link>
+            </h3>
+            {supplier.verified && <VerifiedBadge />}
+          </div>
 
-        {supplier.short_description && (
-          <p className="mt-1.5 max-w-2xl text-[0.95rem] text-muted">{supplier.short_description}</p>
-        )}
-
-        {supplier.categories.length > 0 && (
-          <p className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-sm">
-            {supplier.categories.map((c, i) => (
-              <span key={c.slug}>
-                <Link href={`/categorii/${c.slug}`} className="text-muted hover:text-accent hover:underline">
-                  {c.name}
-                </Link>
-                {i < supplier.categories.length - 1 && <span className="text-rule">,</span>}
-              </span>
-            ))}
+          <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-muted">
+            <LocationIcon className="size-4 text-accent/70" />
+            {location}
           </p>
-        )}
+
+          {supplier.short_description && (
+            <p className="mt-2.5 max-w-2xl text-[0.9375rem] leading-relaxed text-ink-soft">
+              {supplier.short_description}
+            </p>
+          )}
+        </div>
       </div>
 
-      <p className="col-start-2 text-sm text-muted sm:col-start-3 sm:text-right">{location}</p>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line-soft pt-4">
+        <ul className="flex min-w-0 flex-wrap gap-1.5">
+          {supplier.categories.slice(0, 4).map((c) => (
+            <li key={c.slug}>
+              <Link href={`/categorii/${c.slug}`} className="chip">
+                {c.name}
+              </Link>
+            </li>
+          ))}
+          {supplier.categories.length > 4 && (
+            <li className="chip border-dashed">+{supplier.categories.length - 4}</li>
+          )}
+        </ul>
+
+        <Link
+          href={`/distribuitori/${supplier.slug}`}
+          className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+        >
+          Vezi profilul
+          <IconArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </div>
     </article>
   );
 }

@@ -1,39 +1,90 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   Sistemul vizual SupplyHub.
+   Hartie alba pentru continut, fundal calm pentru pagina, contur vizibil
+   pe fiecare bloc. Delimitarea se face prin suprafata si contur, nu doar
+   printr-o linie de un pixel.
+   ------------------------------------------------------------------ */
 @theme {
-  --color-ink: #000000;
-  --color-muted: #5a6169;
-  --color-rule: #e2e5e3;
-  --color-accent: #14653f;
-  --color-accent-soft: #f1f7f3;
+  /* Suprafete */
+  --color-canvas: #f3f6f3;
   --color-paper: #ffffff;
+  --color-sunken: #eaefea;
+  --color-deep: #0d1712;
+
+  /* Text */
+  --color-ink: #101a14;
+  --color-ink-soft: #32403a;
+  --color-muted: #5b6862;
+
+  /* Contururi */
+  --color-line: #d3ddd6;
+  --color-line-soft: #e6ebe7;
+
+  /* Accent */
+  --color-accent: #12603c;
+  --color-accent-strong: #0c4a2d;
+  --color-accent-soft: #eaf3ed;
+  --color-accent-line: #b5d2c2;
+
+  /* Stari */
+  --color-danger: #a32b21;
+  --color-danger-soft: #fdf0ef;
+  --color-danger-line: #eec9c5;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
 
-  --text-display: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
-  --text-display--line-height: 1.04;
-  --text-display--letter-spacing: -0.028em;
+  --text-display: clamp(2.125rem, 1.55rem + 2.3vw, 3.25rem);
+  --text-display--line-height: 1.08;
+  --text-display--letter-spacing: -0.026em;
+
+  --text-title: clamp(1.5rem, 1.28rem + 0.85vw, 1.875rem);
+  --text-title--line-height: 1.18;
+  --text-title--letter-spacing: -0.02em;
+
+  --radius-card: 0.75rem;
+  --radius-tile: 0.5rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgba(13, 23, 18, 0.05);
+  --shadow-lift: 0 14px 30px -18px rgba(13, 23, 18, 0.35), 0 2px 6px -3px rgba(13, 23, 18, 0.08);
+  --shadow-bar: 0 1px 0 rgba(13, 23, 18, 0.04);
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+  color-scheme: light;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
 }
 
 body {
-  background: var(--color-paper);
+  background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-feature-settings: "kern", "liga", "tnum";
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 :focus-visible {
   outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--color-accent-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
@@ -42,26 +93,184 @@ body {
   }
 }
 
-/* Corpul articolelor si descrierile lungi. */
+@layer components {
+  /* Eticheta scurta care anunta o sectiune. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 1.25rem;
+    height: 1px;
+    background: var(--color-accent-line);
+  }
+
+  /* Blocul de baza: hartie alba, contur vizibil, colturi rotunjite. */
+  .card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-hover {
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease,
+      transform 150ms ease;
+  }
+  .card-hover:hover {
+    border-color: var(--color-accent-line);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+
+  /* Butoane */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-tile);
+    border: 1px solid transparent;
+    padding: 0.6875rem 1.125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-accent-strong);
+  }
+  .btn-secondary {
+    background: var(--color-paper);
+    border-color: var(--color-line);
+    color: var(--color-ink);
+  }
+  .btn-secondary:hover {
+    border-color: var(--color-accent-line);
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+  .btn-sm {
+    padding: 0.4375rem 0.8125rem;
+    font-size: 0.875rem;
+  }
+
+  /* Campuri de formular */
+  .field {
+    width: 100%;
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-tile);
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .field::placeholder {
+    color: var(--color-muted);
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+  }
+  .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-ink-soft);
+    margin-bottom: 0.375rem;
+  }
+  select.field {
+    appearance: none;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235b6862' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+  }
+
+  /* Eticheta mica: categorie, judet, status. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: var(--color-paper);
+    padding: 0.1875rem 0.625rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--color-ink-soft);
+  }
+  a.chip:hover {
+    border-color: var(--color-accent-line);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  .chip-accent {
+    border-color: var(--color-accent-line);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Corpul articolelor si al paginilor de text.
+   ------------------------------------------------------------------ */
 .prose {
   max-width: 68ch;
   font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--color-ink-soft);
 }
 .prose > * + * {
-  margin-top: 1.15em;
+  margin-top: 1.2em;
 }
 .prose h2 {
-  margin-top: 2.2em;
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin-top: 2.1em;
+  padding-top: 0.9em;
+  border-top: 1px solid var(--color-line-soft);
+  font-size: 1.4375rem;
+  font-weight: 650;
   letter-spacing: -0.018em;
-  line-height: 1.2;
+  line-height: 1.25;
+  color: var(--color-ink);
 }
 .prose h3 {
   margin-top: 1.8em;
-  font-size: 1.175rem;
-  font-weight: 600;
-  line-height: 1.3;
+  font-size: 1.15rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--color-ink);
+}
+.prose strong {
+  color: var(--color-ink);
+  font-weight: 650;
 }
 .prose ul,
 .prose ol {
@@ -73,34 +282,66 @@ body {
 .prose ol {
   list-style: decimal;
 }
+.prose li::marker {
+  color: var(--color-accent);
+}
 .prose li + li {
-  margin-top: 0.4em;
+  margin-top: 0.45em;
 }
 .prose a {
   color: var(--color-accent);
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
+.prose a:hover {
+  color: var(--color-accent-strong);
+  text-decoration-thickness: 2px;
+}
 .prose blockquote {
-  border-left: 2px solid var(--color-accent);
-  padding-left: 1.1em;
-  color: var(--color-muted);
+  border-left: 3px solid var(--color-accent-line);
+  background: var(--color-accent-soft);
+  border-radius: 0 var(--radius-tile) var(--radius-tile) 0;
+  padding: 0.85em 1.15em;
+  color: var(--color-ink-soft);
+}
+.prose blockquote > * + * {
+  margin-top: 0.6em;
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  margin-top: 2.4em;
 }
 .prose table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-tile);
+  overflow: hidden;
+}
+.prose thead {
+  background: var(--color-sunken);
 }
 .prose th,
 .prose td {
-  border-bottom: 1px solid var(--color-rule);
-  padding: 0.6em 0.75em;
+  border-bottom: 1px solid var(--color-line-soft);
+  padding: 0.65em 0.85em;
   text-align: left;
   vertical-align: top;
 }
+.prose th {
+  font-weight: 650;
+  color: var(--color-ink);
+}
+.prose tbody tr:last-child td {
+  border-bottom: 0;
+}
 .prose code {
-  background: var(--color-accent-soft);
+  background: var(--color-sunken);
+  border: 1px solid var(--color-line-soft);
   padding: 0.1em 0.35em;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 0.9em;
 }
