@@ -3,18 +3,16 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { initialLeadState, submitLead } from "@/app/actions/lead";
+import { IconCheck } from "./Icons";
 
-const field =
-  "mt-1.5 w-full border border-rule bg-white px-3 py-2.5 text-[0.95rem] focus:border-accent focus:outline-none";
+function FieldError({ children }: { children: React.ReactNode }) {
+  return <p className="mt-1.5 text-sm font-medium text-danger">{children}</p>;
+}
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="bg-accent px-6 py-3 font-medium text-white hover:bg-ink disabled:opacity-60"
-    >
+    <button type="submit" disabled={pending} className="btn btn-primary w-full sm:w-auto">
       {pending ? "Se trimite…" : "Trimite cererea"}
     </button>
   );
@@ -35,12 +33,18 @@ export function LeadForm({
 
   if (state.status === "success") {
     return (
-      <div className="border border-accent bg-accent-soft p-6">
-        <h3 className="font-semibold">Cererea a plecat către {supplierName}.</h3>
-        <p className="mt-2 text-[0.95rem] text-muted">
-          Distribuitorul primește datele tale de contact și îți răspunde direct pe email. Dacă vrei
-          să compari mai multe oferte, trimite cererea și altor distribuitori din aceeași categorie.
-        </p>
+      <div className="flex gap-4 rounded-tile border border-accent-line bg-accent-soft p-5">
+        <span className="grid size-9 shrink-0 place-items-center rounded-pill bg-accent text-white">
+          <IconCheck className="size-5" />
+        </span>
+        <div>
+          <h3 className="font-bold text-ink">Cererea a plecat către {supplierName}.</h3>
+          <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-soft">
+            Distribuitorul primește datele tale de contact și îți răspunde direct pe email. Dacă
+            vrei să compari mai multe oferte, trimite cererea și altor distribuitori din aceeași
+            categorie.
+          </p>
+        </div>
       </div>
     );
   }
@@ -59,42 +63,45 @@ export function LeadForm({
       </div>
 
       {state.status === "error" && state.message && (
-        <p role="alert" className="border-l-2 border-accent bg-accent-soft px-4 py-3 text-[0.95rem]">
+        <p
+          role="alert"
+          className="rounded-tile border border-danger-line bg-danger-soft px-4 py-3 text-[0.9375rem] text-danger"
+        >
           {state.message}
         </p>
       )}
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="name" className="text-sm font-medium">
+          <label htmlFor="name" className="field-label">
             Nume și prenume
           </label>
-          <input id="name" name="name" required autoComplete="name" className={field} />
-          {state.errors?.name && <p className="mt-1 text-sm text-accent">{state.errors.name}</p>}
+          <input id="name" name="name" required autoComplete="name" className="field" />
+          {state.errors?.name && <FieldError>{state.errors.name}</FieldError>}
         </div>
         <div>
-          <label htmlFor="company" className="text-sm font-medium">
-            Firmă <span className="text-muted">(opțional)</span>
+          <label htmlFor="company" className="field-label">
+            Firmă <span className="font-normal text-muted">(opțional)</span>
           </label>
-          <input id="company" name="company" autoComplete="organization" className={field} />
+          <input id="company" name="company" autoComplete="organization" className="field" />
         </div>
         <div>
-          <label htmlFor="email" className="text-sm font-medium">
+          <label htmlFor="email" className="field-label">
             Email
           </label>
-          <input id="email" name="email" type="email" required autoComplete="email" className={field} />
-          {state.errors?.email && <p className="mt-1 text-sm text-accent">{state.errors.email}</p>}
+          <input id="email" name="email" type="email" required autoComplete="email" className="field" />
+          {state.errors?.email && <FieldError>{state.errors.email}</FieldError>}
         </div>
         <div>
-          <label htmlFor="phone" className="text-sm font-medium">
-            Telefon <span className="text-muted">(opțional)</span>
+          <label htmlFor="phone" className="field-label">
+            Telefon <span className="font-normal text-muted">(opțional)</span>
           </label>
-          <input id="phone" name="phone" type="tel" autoComplete="tel" className={field} />
+          <input id="phone" name="phone" type="tel" autoComplete="tel" className="field" />
         </div>
       </div>
 
       <div>
-        <label htmlFor="message" className="text-sm font-medium">
+        <label htmlFor="message" className="field-label">
           Ce echipamente cauți
         </label>
         <textarea
@@ -103,13 +110,13 @@ export function LeadForm({
           rows={5}
           required
           placeholder="Tip de echipament, cantitate, termen de livrare, județul în care se montează."
-          className={field}
+          className="field"
         />
-        {state.errors?.message && <p className="mt-1 text-sm text-accent">{state.errors.message}</p>}
+        {state.errors?.message && <FieldError>{state.errors.message}</FieldError>}
       </div>
 
-      <div>
-        <label htmlFor="consent" className="flex items-start gap-3 text-sm">
+      <div className="rounded-tile border border-line-soft bg-canvas p-4">
+        <label htmlFor="consent" className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-soft">
           <input
             id="consent"
             name="consent"
@@ -120,13 +127,16 @@ export function LeadForm({
           <span>
             Sunt de acord ca datele mele de contact să fie transmise acestui distribuitor, ca să
             primesc o ofertă. Detalii în{" "}
-            <a href="/politica-de-confidentialitate" className="text-accent underline underline-offset-2">
+            <a
+              href="/politica-de-confidentialitate"
+              className="font-medium text-accent underline underline-offset-2"
+            >
               politica de confidențialitate
             </a>
             .
           </span>
         </label>
-        {state.errors?.consent && <p className="mt-1 text-sm text-accent">{state.errors.consent}</p>}
+        {state.errors?.consent && <FieldError>{state.errors.consent}</FieldError>}
       </div>
 
       <SubmitButton />

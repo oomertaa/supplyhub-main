@@ -1,21 +1,39 @@
-export function SearchBox({ defaultValue = "" }: { defaultValue?: string }) {
+import { IconSearch } from "./Icons";
+
+/** Cautarea libera. `size="lg"` pentru hero, implicit pentru restul paginilor. */
+export function SearchBox({
+  defaultValue = "",
+  size = "md",
+}: {
+  defaultValue?: string;
+  size?: "md" | "lg";
+}) {
+  const lg = size === "lg";
+
   return (
-    <form action="/distribuitori" method="get" role="search" className="flex flex-wrap gap-3">
+    <form
+      action="/distribuitori"
+      method="get"
+      role="search"
+      className="flex flex-col gap-2.5 sm:flex-row"
+    >
       <label htmlFor="cauta" className="sr-only">
         Caută după nume, categorie sau județ
       </label>
-      <input
-        id="cauta"
-        name="q"
-        type="search"
-        defaultValue={defaultValue}
-        placeholder="Nume, categorie sau județ"
-        className="min-w-0 flex-1 border-b-2 border-ink bg-transparent px-1 py-3 text-lg placeholder:text-muted focus:border-accent focus:outline-none"
-      />
-      <button
-        type="submit"
-        className="border-b-2 border-accent bg-accent px-6 py-3 font-medium text-white hover:bg-ink hover:border-ink"
-      >
+      <div className="relative flex-1">
+        <IconSearch
+          className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted ${lg ? "size-5" : "size-4"}`}
+        />
+        <input
+          id="cauta"
+          name="q"
+          type="search"
+          defaultValue={defaultValue}
+          placeholder="Nume firmă, echipament sau județ"
+          className={`field pl-11 ${lg ? "py-3.5 text-base" : ""}`}
+        />
+      </div>
+      <button type="submit" className={`btn btn-primary ${lg ? "px-7 py-3.5 text-base" : ""}`}>
         Caută
       </button>
     </form>

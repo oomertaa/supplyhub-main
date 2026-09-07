@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import Link from "next/link";
 import { Filters } from "@/components/Filters";
 import { Pagination } from "@/components/Pagination";
+import { PageHeader } from "@/components/PageHeader";
 import { SearchBox } from "@/components/SearchBox";
 import { SupplierRow } from "@/components/SupplierRow";
 import { getCategories, getCounties, listSuppliers } from "@/lib/queries";
@@ -41,6 +42,11 @@ export async function generateMetadata({
   };
 }
 
+function resultLabel(total: number) {
+  if (total === 0) return "Niciun rezultat";
+  return total === 1 ? "1 distribuitor" : `${total} distribuitori`;
+}
+
 export default async function SuppliersPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
   const page = Number(sp.pagina ?? "1") || 1;
@@ -58,25 +64,22 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Se
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14">
-      <Breadcrumbs
+    <>
+      <PageHeader
+        eyebrow="Catalog"
+        title="Distribuitori"
+        lead="Firme care vând echipamente pentru energie verde către instalatori, dezvoltatori și departamente de achiziții."
         crumbs={[
           { name: "Acasă", path: "/" },
           { name: "Distribuitori", path: "/distribuitori" },
         ]}
-      />
+      >
+        <div className="mt-8 max-w-2xl">
+          <SearchBox defaultValue={sp.q ?? ""} />
+        </div>
+      </PageHeader>
 
-      <h1 className="max-w-3xl text-display font-semibold">Distribuitori</h1>
-      <p className="mt-5 max-w-2xl text-lg text-muted">
-        Firme care vând echipamente pentru energie verde către instalatori, dezvoltatori și
-        departamente de achiziții.
-      </p>
-
-      <div className="mt-10 max-w-2xl">
-        <SearchBox defaultValue={sp.q ?? ""} />
-      </div>
-
-      <div className="mt-10">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         <Filters
           categories={categories}
           counties={counties}
@@ -87,43 +90,44 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Se
             verificat: sp.verificat,
           }}
         />
+
+        <p className="mt-7 mb-3 text-sm font-medium text-muted" aria-live="polite">
+          {resultLabel(result.total)}
+        </p>
+
+        {result.items.length > 0 ? (
+          <div className="grid gap-4">
+            {result.items.map((s) => (
+              <SupplierRow key={s.id} supplier={s} />
+            ))}
+          </div>
+        ) : (
+          <div className="card p-8 text-center sm:p-12">
+            <h2 className="text-xl font-bold tracking-tight text-ink">
+              Niciun distribuitor pe filtrele astea
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-muted">
+              Încearcă fără filtrul de județ: distribuitorii care livrează național apar oricum, iar
+              mulți furnizori acoperă mai multe categorii decât cele declarate.
+            </p>
+            <Link href="/distribuitori" className="btn btn-secondary mt-6">
+              Vezi tot catalogul
+            </Link>
+          </div>
+        )}
+
+        <Pagination
+          page={result.page}
+          pageCount={result.pageCount}
+          basePath="/distribuitori"
+          params={{
+            q: sp.q,
+            categorie: sp.categorie,
+            judet: sp.judet,
+            verificat: sp.verificat,
+          }}
+        />
       </div>
-
-      <p className="mt-6 text-sm text-muted" aria-live="polite">
-        {result.total === 0
-          ? "Niciun rezultat"
-          : result.total === 1
-            ? "1 distribuitor"
-            : `${result.total} distribuitori`}
-      </p>
-
-      {result.items.length > 0 ? (
-        <div className="mt-2">
-          {result.items.map((s) => (
-            <SupplierRow key={s.id} supplier={s} />
-          ))}
-        </div>
-      ) : (
-        <div className="mt-8 border-y border-rule py-14">
-          <h2 className="text-xl font-semibold tracking-tight">Niciun distribuitor pe filtrele astea</h2>
-          <p className="mt-3 max-w-xl text-muted">
-            Încearcă fără filtrul de județ: distribuitorii care livrează național apar oricum, iar
-            mulți furnizori acoperă mai multe categorii decât cele declarate.
-          </p>
-        </div>
-      )}
-
-      <Pagination
-        page={result.page}
-        pageCount={result.pageCount}
-        basePath="/distribuitori"
-        params={{
-          q: sp.q,
-          categorie: sp.categorie,
-          judet: sp.judet,
-          verificat: sp.verificat,
-        }}
-      />
-    </div>
+    </>
   );
 }

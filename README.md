@@ -270,5 +270,35 @@ scripts/generate-seed.mjs
 schema.sql, seed.sql
 ```
 
+---
+
+## 8. Sistemul vizual
+
+Nu există librărie de componente. Totul stă în `app/globals.css`: variabilele din blocul
+`@theme` devin automat utilitare Tailwind (`bg-canvas`, `text-muted`, `border-line`,
+`rounded-card`, `shadow-lift` etc.), iar în `@layer components` sunt definite clasele
+refolosite în toată aplicația.
+
+| Grup | Variabile | Rol |
+| --- | --- | --- |
+| Suprafețe | `--color-canvas`, `--color-paper`, `--color-sunken`, `--color-deep` | fundalul paginii, cardurile, benzile secundare, subsolul |
+| Text | `--color-ink`, `--color-ink-soft`, `--color-muted` | titluri, corp de text, text secundar |
+| Contururi | `--color-line`, `--color-line-soft` | conturul blocurilor, separatoarele din interiorul lor |
+| Accent | `--color-accent`, `--color-accent-strong`, `--color-accent-soft`, `--color-accent-line` | verdele mărcii, starea de hover, fundalul și conturul aferente |
+| Stări | `--color-danger`, `--color-danger-soft`, `--color-danger-line` | erorile din formulare |
+
+Clase de componentă: `.card` și `.card-hover` (blocul de bază și starea lui de hover),
+`.btn` cu `.btn-primary` / `.btn-secondary` / `.btn-sm`, `.field` și `.field-label` pentru
+formulare, `.chip` și `.chip-accent` pentru etichete, `.eyebrow` pentru eticheta de deasupra
+titlurilor de secțiune. `.prose` rămâne pentru corpul articolelor și al paginilor de text.
+
+Regula de delimitare: conținutul stă pe carduri albe, pe un fundal `canvas`; antetul fiecărei
+pagini este o bandă albă cu contur inferior. Nu adăuga separatoare de un pixel acolo unde un
+card spune deja unde începe și unde se termină un bloc.
+
+Pictogramele sunt SVG scrise de mână în `components/Icons.tsx` (interfață) și
+`components/CategoryIcon.tsx` (câte una pentru fiecare categorie de echipament, cu simbol
+generic pentru slug-urile adăugate ulterior în Supabase). Nu se instalează pachete de iconițe.
+
 Pagina de vânzare de la `listare.supplyhub.ro` este un produs separat, pe alt host. Nu este
 referită nicăieri în acest proiect și nu apare în sitemap.
